@@ -77,6 +77,17 @@
             font-weight: bold;
         }
 
+        .btn-function {
+        background: #9b59b6;
+        color: white;
+        font-size: 16px;
+        padding: 15px;
+        }
+
+        .btn-function:hover {
+        background: #8e44ad;
+       }
+
         button:hover {
             transform: scale(1.05);
         }
@@ -137,6 +148,15 @@
             <button class="btn-clear" onclick="deleteLast()">DEL</button>
             <button class="btn-operator" onclick="appendOperator('%')">%</button>
             <button class="btn-operator" onclick="appendOperator('/')">÷</button>
+
+             <button class="btn-function" onclick="scientificOp('sqrt')">√</button>
+             <button class="btn-function" onclick="scientificOp('square')">x²</button>
+             <button class="btn-function" onclick="scientificOp('sin')">sin</button>
+             <button class="btn-function" onclick="scientificOp('cos')">cos</button>
+             <button class="btn-function" onclick="scientificOp('tan')">tan</button>
+             <button class="btn-function" onclick="scientificOp('ln')">ln</button>
+             <button class="btn-function" onclick="scientificOp('abs')">|x|</button>
+             <button class="btn-function" onclick="scientificOp('inverse')">1/x</button>
 
             <button class="btn-number" onclick="appendNumber('7')">7</button>
             <button class="btn-number" onclick="appendNumber('8')">8</button>
@@ -262,6 +282,45 @@
         });
 
         updateDisplay();
+
+        function scientificOp(func) {
+        const num = parseFloat(currentInput);
+        let result;
+    
+        switch(func) {
+        case 'sqrt':
+            result = num >= 0 ? Math.sqrt(num) : 'Error';
+            break;
+        case 'square':
+            result = num * num;
+            break;
+        case 'sin':
+            result = Math.sin(num * Math.PI / 180);
+            break;
+        case 'cos':
+            result = Math.cos(num * Math.PI / 180);
+            break;
+        case 'tan':
+            result = Math.tan(num * Math.PI / 180);
+            break;
+        case 'ln':
+            result = num > 0 ? Math.log(num) : 'Error';
+            break;
+        case 'abs':
+            result = Math.abs(num);
+            break;
+        case 'inverse':
+            result = num !== 0 ? 1 / num : 'Error';
+            break;
+        default:
+            return;
+        }
+    
+        currentInput = result.toString();
+        shouldResetDisplay = true;
+        updateDisplay();
+        }
+
     </script>
 </body>
 </html>
