@@ -121,6 +121,80 @@
         .btn-clear:hover {
             background: #c0392b;
         }
+
+        body {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        align-items: flex-start;
+        padding: 40px 20px;
+        }
+
+        .history-panel {
+        background: #2c3e50;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        width: 100%;
+        max-width: 300px;
+        max-height: 600px;
+        display: flex;
+       flex-direction: column;
+       }
+
+       .history-panel h2 {
+       color: #ecf0f1;
+       margin-bottom: 15px;
+       font-size: 20px;
+       }
+
+       .history-list {
+       flex: 1;
+       overflow-y: auto;
+       margin-bottom: 15px;
+      }
+
+      .history-item {
+      background: #34495e;
+      color: #ecf0f1;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 8px;
+     font-size: 14px;
+     }
+
+    .empty-history {
+    color: #7f8c8d;
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+   }
+
+    .btn-clear-history {
+    background: #e74c3c;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .btn-clear-history:hover {
+  background: #c0392b;
+  }
+
+/* Responsive */
+   @media (max-width: 768px) {
+    body {
+        flex-direction: column;
+    }
+    
+    .history-panel {
+        max-width: 100%;
+        order: 2;
+    }
+  }
     </style>
 </head>
 <body>
@@ -158,8 +232,46 @@
             <button class="btn-equals" onclick="calculate()">=</button>
         </div>
     </div>
-
+   <div class="history-panel">
+    <h2>📋 Historial</h2>
+    <div id="historyList" class="history-list">
+        <p class="empty-history">No hay operaciones aún</p>
+    </div>
+    <button class="btn-clear-history" onclick="clearHistory()">Limpiar Historial</button>
+    </div>
     <script>
+
+        let calculationHistory = [];
+
+function addToHistory(expression, result) {
+    const entry = `${expression} = ${result}`;
+    calculationHistory.push(entry);
+    updateHistoryDisplay();
+}
+
+function updateHistoryDisplay() {
+    const list = document.getElementById('historyList');
+    
+    if (calculationHistory.length === 0) {
+        list.innerHTML = '<p class="empty-history">No hay operaciones aún</p>';
+        return;
+    }
+    
+    list.innerHTML = calculationHistory
+        .map(item => `<div class="history-item">${item}</div>`)
+        .reverse()
+        .join('');
+    
+    list.scrollTop = 0;
+}
+
+function clearHistory() {
+    if (confirm('¿Deseas limpiar todo el historial?')) {
+        calculationHistory = [];
+        updateHistoryDisplay();
+    }
+}
+
         let currentInput = '0';
         let previousInput = '';
         let operation = null;
@@ -200,39 +312,47 @@
             updateDisplay();
         }
 
-        function calculate() {
-            if (!operation || !previousInput) return;
+function calculate() {
+    if (!operation || !previousInput) return;
 
-            const prev = parseFloat(previousInput);
-            const current = parseFloat(currentInput);
-            let result;
+    const prev = parseFloat(previousInput);
+    const current = parseFloat(currentInput);
+    let result;
+    
+    // Guardar expresión para el historial
+    const expression = `${previousInput} ${operation} ${currentInput}`;
 
-            switch(operation) {
-                case '+':
-                    result = prev + current;
-                    break;
-                case '-':
-                    result = prev - current;
-                    break;
-                case '*':
-                    result = prev * current;
-                    break;
-                case '/':
-                    result = current !== 0 ? prev / current : 'Error';
-                    break;
-                case '%':
-                    result = prev % current;
-                    break;
-                default:
-                    return;
-            }
+    switch(operation) {
+        case '+':
+            result = prev + current;
+            break;
+        case '-':
+            result = prev - current;
+            break;
+        case '*':
+            result = prev * current;
+            break;
+        case '/':
+            result = current !== 0 ? prev / current : 'Error';
+            break;
+        case '%':
+            result = prev % current;
+            break;
+        default:
+            return;
+    }
 
-            currentInput = result.toString();
-            operation = null;
-            previousInput = '';
-            shouldResetDisplay = true;
-            updateDisplay();
-        }
+    // AGREGAR AL HISTORIAL
+    if (result !== 'Error') {
+        addToHistory(expression, result);
+    }
+
+    currentInput = result.toString();
+    operation = null;
+    previousInput = '';
+    shouldResetDisplay = true;
+    updateDisplay();
+}
 
         function clearAll() {
             currentInput = '0';
